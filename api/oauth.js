@@ -3,7 +3,7 @@ const fitbitClientSecret = process.env.FITBIT_CLIENT_SECRET;
 
 // Implicit OAuth 2.0 Flow
 module.exports = async (req, res) => {
-    const redirectUrl = `https://www.fitbit.com/oauth2/authorize?client_id=${fitbitClientId}&response_type=token&expires_in=31536000&scope=sleep&redirect_uri=http%3A%2F%2Flocalhost%3A4433/api/oauth-callback`;
+    const redirectUrl = `https://www.fitbit.com/oauth2/authorize?client_id=${fitbitClientId}&response_type=token&expires_in=31536000&scope=sleep%20heartrate&redirect_uri=http%3A%2F%2Flocalhost%3A4433/api/oauth-callback`;
     res.writeHead(302, { 'Location': redirectUrl });
     res.end();
 };

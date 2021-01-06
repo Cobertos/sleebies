@@ -33,6 +33,7 @@ async function fakeSleepLog(userId, durationMS) {
     }
   });
   if (!resp.ok) {
+    console.error(resp);
     throw new Error('Log sleep call failed.');
   }
   const { sleep } = await resp.json();
@@ -43,11 +44,39 @@ async function fakeSleepLog(userId, durationMS) {
       Authorization: `Bearer ${userToken}`
     }
   });
-  if (!resp.ok) {
+  if (!resp2.ok) {
+    console.error(resp2);
     throw new Error(`Delete sleep logId ${sleep.logId} failed.`);
   }
 
   return sleep;
+}
+
+async function getIntradayHeartRate(userId, durationMS) {
+  const endDate = dayjs();
+  const startDate = endDate.subtract(durationMS, 'ms');
+  const qs = queryString.stringify({
+    date: startDate.format('YYYY-MM-DD'),
+    startTime: startDate.format('HH:mm'), // 24hr time, from docs it says HH:mm (and how else would it get AM/PM without 24hr?)
+    duration: durationMS
+  });
+  const startDay = startDate.format('YYYY-MM-DD');
+  const endDay = endDate.format('YYYY-MM-DD');
+  const startTime = startDate.format('HH:mm');
+  const endTime = endDate.format('HH:mm');
+  const detailLevel = '1min';
+  const resp = await fetch(`https://api.fitbit.com/1/user/${userId}/activities/heart/date/${startDay}/${endDay}/${detailLevel}/time/${startTime}/${endTime}.json`, {
+    headers: {
+      Authorization: `Bearer ${userToken}`
+    }
+  });
+  if (!resp.ok) {
+    console.error(resp);
+    throw new Error('Heart rate intra day failed.');
+  }
+
+  const json = await resp.json();
+  return json["activities-heart-intraday"];
 }
 
 /**Checks if userId is asleep or awake
@@ -56,8 +85,20 @@ async function fakeSleepLog(userId, durationMS) {
  * @returns {string} "asleep" or "awake"
  */
 async function getCurrentSleepStatus(userId, mins) {
+  // Get sleep/movement data (see notes in fakeSleepLog)
   const { minutesAsleep, minutesAwake } = await fakeSleepLog(userId, mins * 60 * 1000); //15 minutes of data
-  if ((minutesAsleep - minutesAwake) / mins > 0.85) { // At least 85% was asleep
+  const percentageMarkedAsleep = (minutesAsleep - minutesAwake) / mins;
+
+  // Get heart rate
+  const sleepingHeartRate = 58;
+  const { dataset } = await getIntradayHeartRate(userId, mins * 60 * 1000);
+  const averageHeartRate = dataset
+    .map(d => d.value)
+    .reduce((acc, itm) => acc + itm, 0) / dataset.length;
+
+  console.log(`Updated with: Sleep Movement ${percentageMarkedAsleep} | Avg Heart Rate ${averageHeartRate} `);
+
+  if (percentageMarkedAsleep > 0.85 && averageHeartRate < sleepingHeartRate) { // At least 85% was asleep (little movement)
     return "asleep";
   }
   return "awake";
