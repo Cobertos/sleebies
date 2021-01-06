@@ -7,6 +7,10 @@
 
 By using Sleebies (the "Service"), then you agree to the collection and use of information described by this policy.
 
+## Data we collect
+
+We only collect relevant sleep data from FitBit for the purposes of this service. Data is not stored beyond the time needed for performing the service.
+
 ## Third-Party Information Sharing
 
 We employ third-parties to perform tasks on our behalf. Some of these third-parties have access to your Personal Information.
@@ -14,6 +18,10 @@ We employ third-parties to perform tasks on our behalf. Some of these third-part
 Third-parties that have this access and the extent of this access is described below.
 
 * [Vercel Inc](https://vercel.com) - They host our service on our behalf, all data passes through them.
+
+## Process for Data Deletion
+
+Data is only stored in performing the Service so there is not data to delete should you discontinue use of the Service.
 
 ## Changes to This Privacy Policy
 
