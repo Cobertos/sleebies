@@ -11,7 +11,6 @@ dayjs.extend(timezone);
 
 const userToken = process.env.FITBIT_USER_TOKEN;
 
-
 /**Fakes a sleep log in FitBit to get the past X ms sleep data
  * NOTE: That FitBit does not allow for overlapping sleep logs to be created so
  * this has the potential to fail (if a sleep log was recorded in the last
@@ -25,7 +24,7 @@ const userToken = process.env.FITBIT_USER_TOKEN;
  * See https://dev.fitbit.com/build/reference/web-api/sleep/#log-sleep
  */
 async function fakeSleepLog(userId, durationMS) {
-  const startDate = dayjs().subtract(durationMS, 'ms');
+  const startDate = dayjs.tz().subtract(durationMS, 'ms');
   const qs = queryString.stringify({
     date: startDate.format('YYYY-MM-DD'),
     startTime: startDate.format('HH:mm'), // 24hr time, from docs it says HH:mm (and how else would it get AM/PM without 24hr?)
@@ -58,7 +57,7 @@ async function fakeSleepLog(userId, durationMS) {
 }
 
 async function getIntradayHeartRate(userId, durationMS) {
-  const endDate = dayjs();
+  const endDate = dayjs.tz();
   const startDate = endDate.subtract(durationMS, 'ms');
   const qs = queryString.stringify({
     date: startDate.format('YYYY-MM-DD'),
@@ -126,6 +125,7 @@ async function getCurrentSleepStatus(userId, mins) {
 
 const lastFetch = {
   time: undefined,
+  userTimezone: undefined,
   sleepStatus: undefined
 };
 module.exports = async (req, res) => {
@@ -147,11 +147,17 @@ module.exports = async (req, res) => {
     style = req.query.style;
   }
 
-  // First get the user timezone so that all our queries are proper and set that
-  // as dayjs's default timezone
-  const { timezone } = await getUserProfile(userid);
-  console.log(`Set timezone to ${timezone}`);
-  dayjs.tz.setDefault(timezone);
+  // Get all timezone information so we're claculating the proper times for "now"
+  // even when the user is in a different timezone
+  const localTimezone = dayjs.tz.guess();
+  console.log(`Server timezone is ${localTimezone}`);
+
+  if (!lastFetch.userTimezone) {
+    const { timezone } = await getUserProfile(userid);
+    lastFetch.userTimezone = timezone;
+  }
+  console.log(`User timezone is ${lastFetch.userTimezone}`);
+  dayjs.tz.setDefault(lastFetch.userTimezone);
 
   // Get the fitbit sleep status (only every 15 minutes)
   let sleepStatus = lastFetch.sleepStatus;
