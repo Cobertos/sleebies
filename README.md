@@ -2,7 +2,7 @@
 
 ![Sleep/Awake](https://sleebies.vercel.app/api/[userid])
 
-A sleep badge status experiment using FitBit API and Vercel
+A badge showing 'sleep' or 'awake' based on your FitBit data. An experiment with the FitBit API and Vercel.
 
 Adapted from [datejer/vercel-badge](https://github.com/datejer/vercel-badge)
 
