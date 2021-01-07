@@ -1,11 +1,34 @@
+const queryString = require('query-string');
+
 const fitbitClientId = process.env.FITBIT_CLIENT_ID;
 const fitbitClientSecret = process.env.FITBIT_CLIENT_SECRET;
 
 // Implicit OAuth 2.0 Flow
 module.exports = async (req, res) => {
-    const redirectUrl = `https://www.fitbit.com/oauth2/authorize?client_id=${fitbitClientId}&response_type=token&expires_in=31536000&scope=sleep%20heartrate&redirect_uri=http%3A%2F%2Flocalhost%3A4433/api/oauth-callback`;
-    res.writeHead(302, { 'Location': redirectUrl });
+  if (!fitbitClientId) {
+    res.write('Vercel variable FITBIT_CLIENT_ID not set.')
     res.end();
+    return;
+  }
+
+  const host = req.headers['x-forwarded-host'];
+  const protocol = req.headers['x-forwarded-proto'];
+  if (!host || !protocol) {
+    res.write('No x-forwarded-* headers (should be there with Vercel?)')
+    res.end();
+    return;
+  }
+
+  const qs = queryString.stringify({
+    client_id: fitbitClientId,
+    response_type: 'token',
+    expires_in: 31536000,
+    scope: 'sleep heartrate',
+    redirect_uri: `${protocol}://${host}/api/oauth-callback`
+  });
+  const redirectUrl = `https://www.fitbit.com/oauth2/authorize?${qs}`;
+  res.writeHead(302, { 'Location': redirectUrl });
+  res.end();
 };
 
 // TODO: Can't use Auth Code Flow for this because the token expires in just 8 hours
