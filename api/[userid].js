@@ -111,6 +111,12 @@ const lastFetch = {
 module.exports = async (req, res) => {
   const { userid } = req.query;
 
+  if (!userToken) {
+    res.write('Vercel variable FITBIT_USER_TOKEN not set.')
+    res.end();
+    return;
+  }
+
   let style = "flat";
   if (
     req.query.style === "flat" ||
