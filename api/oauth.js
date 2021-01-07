@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
     client_id: fitbitClientId,
     response_type: 'token',
     expires_in: 31536000,
-    scope: 'sleep heartrate',
+    scope: 'sleep heartrate profile',
     redirect_uri: `${protocol}://${host}/api/oauth-callback`
   });
   const redirectUrl = `https://www.fitbit.com/oauth2/authorize?${qs}`;

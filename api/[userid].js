@@ -1,8 +1,13 @@
 const path = require("path");
 const fs = require("fs");
 const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 const fetch = require('node-fetch');
 const queryString = require('query-string');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const userToken = process.env.FITBIT_USER_TOKEN;
 
@@ -79,6 +84,21 @@ async function getIntradayHeartRate(userId, durationMS) {
   return json["activities-heart-intraday"];
 }
 
+async function getUserProfile(userId) {
+  const resp = await fetch(`https://api.fitbit.com/1/user/${userId}/profile.json`, {
+    headers: {
+      Authorization: `Bearer ${userToken}`
+    }
+  });
+  if (!resp.ok) {
+    console.error(resp);
+    throw new Error('User profile get failed.');
+  }
+
+  const { user } = await resp.json();
+  return user;
+}
+
 /**Checks if userId is asleep or awake
  * @param {string} userId The FitBit user id
  * @param {number} mins The past amount of minutes to check
@@ -126,6 +146,12 @@ module.exports = async (req, res) => {
   ) {
     style = req.query.style;
   }
+
+  // First get the user timezone so that all our queries are proper and set that
+  // as dayjs's default timezone
+  const { timezone } = await getUserProfile(userid);
+  console.log(`Set timezone to ${timezone}`);
+  dayjs.tz.setDefault(timezone);
 
   // Get the fitbit sleep status (only every 15 minutes)
   let sleepStatus = lastFetch.sleepStatus;

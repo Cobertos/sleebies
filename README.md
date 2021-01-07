@@ -46,6 +46,7 @@ You must deploy your own version to use this. I cannot make this work for other 
 * Authorize your application
 * Grab the `FITBIT_USER_ID` and `FITBIT_USER_TOKEN` after the authorization
   * The token expires in 1 year
+  * The token uses 3 scopes. `sleep` for sleep data, `heartrate` for intraday heartrate data, and `profile` for timezone information
 * Set these in Vercel
 
 Now you're ready to use. See **Usage** above to use :3
