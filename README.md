@@ -1,6 +1,6 @@
 # Sleebies
 
-![Sleep/Awake](https://sleebies.vercel.app/api/[userid])
+![Sleep/Awake](https://sleebies.vercel.app/api/95QFMH)
 
 A badge showing 'sleep' or 'awake' based on your FitBit data. An experiment with the FitBit API and Vercel.
 
@@ -18,7 +18,7 @@ Replace `[userid]` with the FitBit OAuth 2.0 user id retrieved from the OAuth en
 
 | Parameter | Types                                                                           | Description                             | Example                                                                       |
 | --------- | ------------------------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------- |
-| style     | Default: `flat`<br>Available: `flat`, `flat-square`, `for-the-badge`, `plastic` | Select the visual style for your badge. | `https://sleebies.vercel.app/api/datejer/vercel-badge?style=for-the-badge` |
+| style     | Default: `flat`<br>Available: `flat`, `flat-square`, `for-the-badge`, `plastic` | Select the visual style for your badge. | `https://sleebies.vercel.app/api/95QFMH?style=for-the-badge` |
 
 ## Deploying
 
